@@ -16,7 +16,8 @@ export async function GET(request) {
     const { password: _, ...merchantData } = merchant;
     return NextResponse.json({ merchant: merchantData });
   } catch (error) {
-    return NextResponse.json({ error: 'Server error.' }, { status: 500 });
+    console.error('Profile GET Error:', error);
+    return NextResponse.json({ error: error.message || 'Server error.' }, { status: 500 });
   }
 }
 
@@ -56,6 +57,7 @@ export async function POST(request) {
     await saveMerchant(merchant);
     return NextResponse.json({ success: true, message: 'Paytm credentials updated successfully.' });
   } catch (error) {
-    return NextResponse.json({ error: 'Invalid request body or server error.' }, { status: 400 });
+    console.error('Profile POST Error:', error);
+    return NextResponse.json({ error: error.message || 'Server error.' }, { status: 500 });
   }
 }

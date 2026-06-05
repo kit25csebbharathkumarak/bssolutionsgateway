@@ -34,6 +34,7 @@ export async function POST(request) {
     const { password: _, ...merchantData } = newMerchant;
     return NextResponse.json({ success: true, merchant: merchantData });
   } catch (error) {
-    return NextResponse.json({ error: 'Invalid request body.' }, { status: 400 });
+    console.error('Registration Error:', error);
+    return NextResponse.json({ error: error.message || 'Server error during registration.' }, { status: 500 });
   }
 }

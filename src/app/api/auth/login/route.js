@@ -18,6 +18,7 @@ export async function POST(request) {
     const { password: _, ...merchantData } = merchant;
     return NextResponse.json({ success: true, merchant: merchantData });
   } catch (error) {
-    return NextResponse.json({ error: 'Invalid request body.' }, { status: 400 });
+    console.error('Login Error:', error);
+    return NextResponse.json({ error: error.message || 'Server error during login.' }, { status: 500 });
   }
 }
