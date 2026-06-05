@@ -72,7 +72,9 @@ export async function POST(request) {
     await createOrder(newOrder);
 
     const url = new URL(request.url);
-    const checkoutUrl = `${url.origin}/pay/${gatewayOrderId}`;
+    const host = request.headers.get('x-forwarded-host') || url.host;
+    const proto = request.headers.get('x-forwarded-proto') || url.protocol.replace(':', '');
+    const checkoutUrl = `${proto}://${host}/pay/${gatewayOrderId}`;
 
     return NextResponse.json({
       success: true,
