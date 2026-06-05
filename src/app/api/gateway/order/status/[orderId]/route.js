@@ -19,6 +19,7 @@ export async function GET(request, { params }) {
       paytmTxnId: order.paytmTxnId,
       createdAt: order.createdAt,
       verifiedAt: order.verifiedAt,
+      upiUrl: order.upiUrl,
       redirectUrl: order.redirectUrl
     });
   } catch (error) {
