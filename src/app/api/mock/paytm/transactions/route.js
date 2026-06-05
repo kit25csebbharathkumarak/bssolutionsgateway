@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getPaytmTransactions, readDb, writeDb } from '@/lib/db';
+import { getPaytmTransactions, clearPaytmTransactions } from '@/lib/db';
 
 export async function GET(request) {
   try {
@@ -10,7 +10,7 @@ export async function GET(request) {
       return NextResponse.json({ error: 'Merchant ID (mid) is required.' }, { status: 400 });
     }
 
-    const transactions = getPaytmTransactions(mid);
+    const transactions = await getPaytmTransactions(mid);
     return NextResponse.json({ transactions });
   } catch (error) {
     return NextResponse.json({ error: 'Internal Server Error.' }, { status: 500 });
@@ -22,13 +22,7 @@ export async function DELETE(request) {
     const { searchParams } = new URL(request.url);
     const mid = searchParams.get('mid');
     
-    const db = readDb();
-    if (mid) {
-      db.paytmTransactions = db.paytmTransactions.filter(tx => tx.paytmMID !== mid);
-    } else {
-      db.paytmTransactions = [];
-    }
-    writeDb(db);
+    await clearPaytmTransactions(mid);
     return NextResponse.json({ success: true, message: 'Simulator transactions cleared.' });
   } catch (error) {
     return NextResponse.json({ error: 'Internal Server Error.' }, { status: 500 });

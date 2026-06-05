@@ -29,7 +29,7 @@ export async function POST(request) {
       );
     }
 
-    const merchant = getMerchantByApiKey(apiKey);
+    const merchant = await getMerchantByApiKey(apiKey);
     if (!merchant) {
       return NextResponse.json({ error: 'Invalid API key.' }, { status: 401 });
     }
@@ -69,7 +69,7 @@ export async function POST(request) {
       logs: []
     };
 
-    createOrder(newOrder);
+    await createOrder(newOrder);
 
     const url = new URL(request.url);
     const checkoutUrl = `${url.origin}/pay/${gatewayOrderId}`;

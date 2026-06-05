@@ -21,7 +21,7 @@ export async function POST(request) {
       isClaimed: false
     };
 
-    addPaytmTransaction(newTx);
+    await addPaytmTransaction(newTx);
     return NextResponse.json({ success: true, transaction: newTx });
   } catch (error) {
     return NextResponse.json({ error: 'Invalid request body.' }, { status: 400 });

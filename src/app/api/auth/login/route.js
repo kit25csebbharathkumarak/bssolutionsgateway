@@ -10,7 +10,7 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Email and password are required.' }, { status: 400 });
     }
 
-    const merchant = getMerchantByEmail(email);
+    const merchant = await getMerchantByEmail(email);
     if (!merchant || merchant.password !== password) {
       return NextResponse.json({ error: 'Invalid email or password.' }, { status: 401 });
     }

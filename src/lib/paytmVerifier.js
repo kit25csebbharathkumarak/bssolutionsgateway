@@ -1,4 +1,4 @@
-import { getOrderById, updateOrder, readDb, writeDb, getMerchantById } from './db';
+import { getOrderById, updateOrder, getMerchantById, getPaytmTransactions, claimPaytmTransaction } from './db';
 
 /**
  * Simulates a crawler check on Paytm Business Dashboard
@@ -6,7 +6,7 @@ import { getOrderById, updateOrder, readDb, writeDb, getMerchantById } from './d
  * @returns {Promise<{success: boolean, message: string, txnId?: string}>}
  */
 export async function verifyOrderWithPaytm(orderId) {
-  const order = getOrderById(orderId);
+  const order = await getOrderById(orderId);
   if (!order) {
     return { success: false, message: 'Order not found.' };
   }
@@ -15,7 +15,7 @@ export async function verifyOrderWithPaytm(orderId) {
     return { success: true, message: 'Order already completed.', txnId: order.paytmTxnId };
   }
 
-  const merchant = getMerchantById(order.merchantId);
+  const merchant = await getMerchantById(order.merchantId);
   if (!merchant) {
     return { success: false, message: 'Merchant not found.' };
   }
@@ -51,9 +51,8 @@ export async function verifyOrderWithPaytm(orderId) {
 
   addLog(`Querying recent transaction history. Filtering for Credit transactions...`);
 
-  // Now inspect the mock Paytm transactions in db.json
-  const db = readDb();
-  const rawTxList = db.paytmTransactions || [];
+  // Now inspect the mock Paytm transactions (supports both JSON and MongoDB)
+  const rawTxList = await getPaytmTransactions(paytmMID);
 
   // Filter transactions:
   // 1. Must belong to the merchant's Paytm MID
@@ -85,14 +84,10 @@ export async function verifyOrderWithPaytm(orderId) {
     order.logs = logs;
 
     // Save state
-    updateOrder(order);
+    await updateOrder(order);
     
     // Update transaction in db
-    const txIndex = db.paytmTransactions.findIndex(t => t.txnId === matchingTx.txnId);
-    if (txIndex > -1) {
-      db.paytmTransactions[txIndex] = matchingTx;
-      writeDb(db);
-    }
+    await claimPaytmTransaction(matchingTx.txnId);
 
     addLog(`Order ${orderId} marked as PAID successfully.`);
     return {
@@ -106,7 +101,7 @@ export async function verifyOrderWithPaytm(orderId) {
     
     // Save failed attempt logs inside the order
     order.logs = logs;
-    updateOrder(order);
+    await updateOrder(order);
 
     return {
       success: false,

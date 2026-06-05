@@ -8,7 +8,7 @@ export async function GET(request) {
       return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
     }
 
-    const orders = getMerchantOrders(merchantId);
+    const orders = await getMerchantOrders(merchantId);
     orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     return NextResponse.json({ orders });

@@ -10,7 +10,7 @@ export async function POST(request) {
       return NextResponse.json({ error: 'All fields are required.' }, { status: 400 });
     }
 
-    const existing = getMerchantByEmail(email);
+    const existing = await getMerchantByEmail(email);
     if (existing) {
       return NextResponse.json({ error: 'Email already registered.' }, { status: 400 });
     }
@@ -28,7 +28,7 @@ export async function POST(request) {
       createdAt: new Date().toISOString()
     };
 
-    saveMerchant(newMerchant);
+    await saveMerchant(newMerchant);
 
     // Remove password from response
     const { password: _, ...merchantData } = newMerchant;

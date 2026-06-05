@@ -8,7 +8,7 @@ export async function GET(request) {
       return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
     }
 
-    const merchant = getMerchantById(merchantId);
+    const merchant = await getMerchantById(merchantId);
     if (!merchant) {
       return NextResponse.json({ error: 'Merchant not found.' }, { status: 404 });
     }
@@ -27,7 +27,7 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
     }
 
-    const merchant = getMerchantById(merchantId);
+    const merchant = await getMerchantById(merchantId);
     if (!merchant) {
       return NextResponse.json({ error: 'Merchant not found.' }, { status: 404 });
     }
@@ -37,13 +37,13 @@ export async function POST(request) {
 
     if (action === 'generate_key') {
       merchant.apiKey = 'bs_live_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-      saveMerchant(merchant);
+      await saveMerchant(merchant);
       return NextResponse.json({ success: true, apiKey: merchant.apiKey });
     }
 
     if (action === 'revoke_key') {
       merchant.apiKey = null;
-      saveMerchant(merchant);
+      await saveMerchant(merchant);
       return NextResponse.json({ success: true, message: 'API key revoked.' });
     }
 
@@ -53,7 +53,7 @@ export async function POST(request) {
     merchant.paytmPassword = paytmPassword || '';
     merchant.paytmUPI = paytmUPI || '';
 
-    saveMerchant(merchant);
+    await saveMerchant(merchant);
     return NextResponse.json({ success: true, message: 'Paytm credentials updated successfully.' });
   } catch (error) {
     return NextResponse.json({ error: 'Invalid request body or server error.' }, { status: 400 });

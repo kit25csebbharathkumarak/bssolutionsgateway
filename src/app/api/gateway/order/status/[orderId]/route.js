@@ -4,7 +4,7 @@ import { getOrderById } from '@/lib/db';
 export async function GET(request, { params }) {
   try {
     const { orderId } = await params;
-    const order = getOrderById(orderId);
+    const order = await getOrderById(orderId);
 
     if (!order) {
       return NextResponse.json({ error: 'Order not found.' }, { status: 404 });
